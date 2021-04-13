@@ -25,14 +25,6 @@ def get_port():
     return int(port)
 
 
-# 0->vazio
-# 1,2,3,4 -> navios
-# -1 -> local acertado
-# def read_board_from_file():
-#     global board
-#     board_file = open('board.txt', 'r')
-#     board = [[int(char) for char in line[:-1]] for line in board_file.readlines()]
-
 def decide_vertical_or_horizontal():
     decide = random.randint(0, 1)
     if decide == 1:
@@ -118,7 +110,10 @@ def print_board():
     for i in range(0, 10):
         print(f'{i} ', end='')
         for j in range(0, 10):
-            print(f'{board[i][j]} ', end='')
+            if board[i][j] >= 0:
+                print(f'{board[i][j]} ', end='')
+            else:
+                print('x ', end='')
         print('')
 
 
@@ -143,9 +138,9 @@ def awaiting_connection():
     client_data_bytes = client_socket.recv(512)
     client_data = pickle.loads(client_data_bytes)
 
-    if not client_data == 'Start game':
+    if not client_data == 'Start Game':
         print('Unexpected data from client')
-        return
+        exit()
 
 
 def confirm_start_game():
@@ -202,14 +197,18 @@ def coordinate_inside_board(x, y):
 
 
 def get_target_coordinates():
+    global hit_last_round, target_row, target_col
     if hit_last_round:
-        col, row = generate_new_coordinate_based_on_hit()
+        row, col = generate_new_coordinate_based_on_hit()
         while not coordinate_inside_board(row, col):
-            col, row = generate_new_coordinate_based_on_hit()
+            row, col = generate_new_coordinate_based_on_hit()
 
     else:
         row = random.randint(0, 9)
         col = random.randint(0, 9)
+
+    target_row = row
+    target_col = col
 
     return row, col
 
@@ -226,7 +225,7 @@ def generate_new_coordinate_based_on_hit():
     else:
         row = target_row
         col = target_col + dy[random_number_plus_or_minus]
-    return col, row
+    return row, col
 
 
 def client_has_hit_boat(target):
@@ -234,19 +233,19 @@ def client_has_hit_boat(target):
 
 
 def main():
-    # start_server()
-    # awaiting_connection()
-    # confirm_start_game()
+    start_server()
+    awaiting_connection()
+    confirm_start_game()
     generate_board()
     print_board()
-    # print("Game Started")
-    # print_board()
-    # while not game_end:
-    #     play_game()
-    # print('Client disconnected')
-    # print('Closing server')
-    # client_socket.close()
-    # server_socket.close()
+    print("Game Started")
+    print_board()
+    while not game_end:
+        play_game()
+    print('Client disconnected')
+    print('Closing server')
+    client_socket.close()
+    server_socket.close()
 
 
 main()
