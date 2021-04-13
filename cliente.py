@@ -110,6 +110,7 @@ def play_game():
         update_server_board(server_status, row, col)
 
         if game_end:
+            print_boards()
             print("Game ended, Client wins !! Congratulations")
             return
     elif server_status == 'miss':
