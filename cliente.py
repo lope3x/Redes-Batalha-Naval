@@ -3,8 +3,6 @@ import pickle
 import sys
 import time
 
-HOST = '127.0.0.1'  # The server's hostname or IP address
-PORT = 65432  # The port used by the server
 game_end = False
 server_board = None
 client_board = None
@@ -87,9 +85,6 @@ def play_game():
         "col": col,
         "status": 'hit' if server_hitted_last_round else ''
     }
-
-    if server_hitted_last_round:
-        print(data_to_send_to_server['status'])
 
     client_socket.send(pickle.dumps(data_to_send_to_server))
 
